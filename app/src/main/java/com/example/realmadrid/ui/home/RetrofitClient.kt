@@ -1,7 +1,5 @@
 package com.example.realmadrid.ui.home
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -10,8 +8,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
 
     val BASE_URL = "https://apiv3.apifootball.com/"
-
-//    val gson: Gson = GsonBuilder().setLenient().create()
 
     val apiService: FootballApiService by lazy {
         Retrofit.Builder()

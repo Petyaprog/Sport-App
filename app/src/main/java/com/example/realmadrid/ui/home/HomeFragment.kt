@@ -1,4 +1,4 @@
-package com.example.realmadrid
+package com.example.realmadrid.ui.home
 
 import android.os.Bundle
 import android.util.Log
@@ -8,15 +8,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.realmadrid.ui.home.Match
-import com.example.realmadrid.ui.home.RetrofitClient
+import com.example.realmadrid.R
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
     private lateinit var matchScoreTextView: TextView
     private lateinit var goalsTextView: TextView
-//
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -26,13 +25,12 @@ class HomeFragment : Fragment() {
         goalsTextView = view.findViewById(R.id.goals_text_view)
         return view
     }
-//
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadMatches()
     }
-//
-//    @SuppressLint("SetTextI18n")
+
     private fun loadMatches() {
         lifecycleScope.launch {
             try {
