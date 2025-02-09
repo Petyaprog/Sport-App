@@ -1,4 +1,5 @@
 [versions]
+glide = "4.12.0"
 coreKtxVersion = "1.15.0"
 kotlinxCoroutinesAndroid = "1.6.0"
 lifecycleLivedataKtxVersion = "2.8.7"
@@ -25,6 +26,8 @@ navigationFragmentKtx = "2.8.6"
 navigationUiKtx = "2.8.6"
 
 [libraries]
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+glideCompiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 androidx-core-ktx-v1100 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-lifecycle-livedata-ktx-v251 = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtxVersion" }
 androidx-lifecycle-runtime-ktx-v251 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
