@@ -2,19 +2,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/black">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:background="@color/dark"
+            android:layout_height="233dp"
+            android:background="@color/black"
             android:fitsSystemWindows="true"
-            app:contentScrim="@color/dark"
+            app:contentScrim="@color/black"
             app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
 
             <androidx.appcompat.widget.Toolbar
@@ -30,35 +32,89 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:textColor="@android:color/white"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/match_score_text_view"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|bottom"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />
+                android:orientation="vertical"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:id="@+id/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text=""
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_collapseMode="none" />
+
+                <TextView
+                    android:id="@+id/match_score_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/home_team_logo"
-                android:layout_width="44dp"
-                android:layout_height="37dp"
-                android:layout_gravity="start|center|bottom"
-                android:layout_marginStart="16dp" />
+                android:layout_width="59dp"
+                android:layout_height="47dp"
+                android:layout_gravity="start|bottom"
+                android:layout_marginStart="16dp"
+                android:layout_marginBottom="5dp" />
 
             <ImageView
                 android:id="@+id/away_team_logo"
-                android:layout_width="44dp"
-                android:layout_height="37dp"
-                android:layout_gravity="end|center|bottom"
-                android:layout_marginEnd="16dp" />
+                android:layout_width="59dp"
+                android:layout_height="47dp"
+                android:layout_gravity="end|bottom"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="66dp"
+            android:background="@color/design_default_color_error"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/history_button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/dark"
+                android:text="History"
+                android:textColor="@android:color/white"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/stats_button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/dark"
+                android:text="Stats"
+                android:textColor="@android:color/white"
+                android:textSize="15sp" />
+        </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -69,12 +125,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <Button
-                android:id="@+id/history_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Показать историю матчей" />
-
             <LinearLayout
                 android:id="@+id/history_layout"
                 android:layout_width="match_parent"
@@ -82,6 +132,24 @@
                 android:orientation="vertical"
                 android:visibility="gone" />
 
+            <LinearLayout
+                android:id="@+id/Statistics_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/league_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Название лиги"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_anchor="@+id/appBarLayout"
+        app:layout_anchorGravity="top|center" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

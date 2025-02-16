@@ -7,8 +7,10 @@ data class Match(
     val league_id: String,
     val league_name: String,
     val match_date: String,
-    val match_status: String?,
+    val match_status: String,
+    val match_stadium: String,
     val match_time: String,
+    val match_live: String,
     val match_hometeam_id: String,
     val match_hometeam_name: String,
     val team_home_badge: String, // Логотип домашней команды
