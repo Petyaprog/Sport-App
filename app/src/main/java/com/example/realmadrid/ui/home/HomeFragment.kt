@@ -16,7 +16,6 @@ import com.bumptech.glide.Glide
 import com.example.realmadrid.R
 import kotlinx.coroutines.launch
 
-
 class HomeFragment : Fragment() {
 
     private lateinit var matchScoreTextView: TextView
@@ -27,8 +26,8 @@ class HomeFragment : Fragment() {
     private lateinit var statsButton: Button
     private lateinit var historyLayout: LinearLayout
     private lateinit var statisticsLayout: LinearLayout
-    private lateinit var league_name: TextView // Для названия лиги
-    private lateinit var timeTextView: TextView // Для текущей минуты матча
+    private lateinit var league_name: TextView
+    private lateinit var timeTextView: TextView
 
     private var allMatches: List<Match> = emptyList()
     private var currentMatchIndex = 0
@@ -57,16 +56,16 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         loadMatches()
         historyButton.setOnClickListener { showHistory() }
-        statsButton.setOnClickListener { showStats() }
+//        statsButton.setOnClickListener { showStats() }
     }
 
     private fun loadMatches() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitClient.apiService.getMatches(
-                    teamId = 76,
-                    from = "2025-02-07",
-                    to = "2025-11-09",
+                    teamId = 2986,
+                    from = "2024-08-07",
+                    to = "2025-12-09",
                     apiKey = "fbeb2c690d9967cfb237f410b95c9658dd64bdbf8143a629f0ffb56c216ebe64",
                     timezone = "Europe/Moscow"
                 )
@@ -88,7 +87,7 @@ class HomeFragment : Fragment() {
         // Устанавливаем текущую минуту матча
         timeTextView.text = when {
             match.match_live == "0" -> ""
-            else -> match.match_live ?: "" // Текущая минута матча
+            else -> match.match_status // Текущая минута матча
         }
 
         // Устанавливаем счет матча
@@ -139,39 +138,39 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @SuppressLint("SetTextI18n", "MissingInflatedId")
-    private fun showStats() {
-        historyLayout.visibility = View.GONE
-        statisticsLayout.visibility = View.VISIBLE
-        statisticsLayout.removeAllViews()
-
-        // Инициализация элементов интерфейса
-        val statsView = layoutInflater.inflate(R.layout.statistics_match, statisticsLayout, false)
-        val statsTable = statsView.findViewById<TableLayout>(R.id.statistics_table)
-        val statsHomeTeamLogo = statsView.findViewById<ImageView>(R.id.stats_home_team_logo)
-        val statsAwayTeamLogo = statsView.findViewById<ImageView>(R.id.stats_away_team_logo)
-        val nameStadium = statsView.findViewById<TextView>(R.id.name_stadium)
-
-        // Загрузка логотипов команд
-        Glide.with(requireContext()).load(allMatches[currentMatchIndex].team_home_badge).into(statsHomeTeamLogo)
-        Glide.with(requireContext()).load(allMatches[currentMatchIndex].team_away_badge).into(statsAwayTeamLogo)
-
-        // Установка названия стадиона
-        nameStadium.text = allMatches[currentMatchIndex].match_stadium
-
-        // Заполнение данных статистики
-        allMatches[currentMatchIndex].statistics.forEach { stat ->
-            val tableRow = layoutInflater.inflate(R.layout.statistics_match, statsTable, false)
-            val indicatorStats = tableRow.findViewById<TextView>(R.id.indicator_stats)
-            val indicatorHomeTeam = tableRow.findViewById<TextView>(R.id.indicator_home_team)
-            val indicatorAwayTeam = tableRow.findViewById<TextView>(R.id.indicator_away_team)
-
-            indicatorStats.text = stat.type
-            indicatorHomeTeam.text = stat.home
-            indicatorAwayTeam.text = stat.away
-
-            statsTable.addView(tableRow)
-        }
-        statisticsLayout.addView(statsView)
-    }
+//    @SuppressLint("SetTextI18n", "MissingInflatedId")
+//    private fun showStats() {
+//        historyLayout.visibility = View.GONE
+//        statisticsLayout.visibility = View.VISIBLE
+//        statisticsLayout.removeAllViews()
+//
+//        // Инициализация элементов интерфейса
+//        val statsView = layoutInflater.inflate(R.layout.statistics_match, statisticsLayout, false)
+//        val statsTable = statsView.findViewById<TableLayout>(R.id.statistics_table)
+//        val statsHomeTeamLogo = statsView.findViewById<ImageView>(R.id.stats_home_team_logo)
+//        val statsAwayTeamLogo = statsView.findViewById<ImageView>(R.id.stats_away_team_logo)
+//        val nameStadium = statsView.findViewById<TextView>(R.id.name_stadium)
+//
+//        // Загрузка логотипов команд
+//        Glide.with(requireContext()).load(allMatches[currentMatchIndex].team_home_badge).into(statsHomeTeamLogo)
+//        Glide.with(requireContext()).load(allMatches[currentMatchIndex].team_away_badge).into(statsAwayTeamLogo)
+//
+//        // Установка названия стадиона
+//        nameStadium.text = allMatches[currentMatchIndex].match_stadium
+//
+//        // Заполнение данных статистики
+//        allMatches[currentMatchIndex].statistics.forEach { stat ->
+//            val tableRow = layoutInflater.inflate(R.layout.statistics_match, statsTable, false)
+//            val indicatorStats = tableRow.findViewById<TextView>(R.id.indicator_stats)
+//            val indicatorHomeTeam = tableRow.findViewById<TextView>(R.id.indicator_home_team)
+//            val indicatorAwayTeam = tableRow.findViewById<TextView>(R.id.indicator_away_team)
+//
+//            indicatorStats.text = stat.type
+//            indicatorHomeTeam.text = stat.home
+//            indicatorAwayTeam.text = stat.away
+//
+//            statsTable.addView(tableRow)
+//        }
+//        statisticsLayout.addView(statsView)
+//    }
 }

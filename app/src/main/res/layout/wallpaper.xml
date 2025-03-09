@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#1A59A3"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="409dp"
         android:layout_height="889dp"
         android:orientation="vertical"
-        android:background="@drawable/img_4"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp"
         tools:ignore="MissingConstraints">
@@ -17,7 +17,7 @@
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/img" />
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/img_4" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

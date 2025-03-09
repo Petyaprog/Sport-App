@@ -1,6 +1,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
@@ -81,35 +82,40 @@
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="66dp"
             android:background="@color/design_default_color_error"
-            android:orientation="horizontal"
             android:padding="8dp">
 
             <Button
                 android:id="@+id/history_button"
-                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                style="@style/Theme.Material3.DynamicColors.Dark"
                 android:layout_weight="1"
-                android:backgroundTint="@color/dark"
+                android:backgroundTint="@color/material_dynamic_secondary10"
                 android:text="History"
                 android:textColor="@android:color/white"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:layout_constraintEnd_toStartOf="@+id/stats_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/stats_button"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Theme.Material3.DynamicColors.Dark"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="@color/dark"
+                android:backgroundTint="@color/material_dynamic_secondary10"
                 android:text="Stats"
                 android:textColor="@android:color/white"
-                android:textSize="15sp" />
-        </LinearLayout>
+                android:textSize="15sp"
+                app:layout_constraintStart_toEndOf="@id/history_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView

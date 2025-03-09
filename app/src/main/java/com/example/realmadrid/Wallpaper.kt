@@ -14,7 +14,7 @@ class Wallpaper : AppCompatActivity() {
         setContentView(R.layout.wallpaper)
 
         Handler().postDelayed({
-            val myIntent = Intent(this, MainActivity::class.java)
+            val myIntent = Intent(this, Authorization::class.java)
             startActivity(myIntent)
             finish() // Завершение текущей активности
         }, 5000)

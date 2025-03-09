@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         val navController: NavController = navHostFragment.navController
 
         val appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+            setOf(R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications, R.id.navigation_profile)
         )
 
         // Убираем настройку ActionBar, так как Toolbar больше нет
