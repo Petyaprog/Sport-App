@@ -20,10 +20,9 @@ class Authorization : AppCompatActivity() {
         admin_button = findViewById(R.id.admin_button)
         user_button = findViewById(R.id.user_button)
 
-        user_button.setOnClickListener{
-            val myIntent = Intent(this, MainActivity::class.java)
-            startActivity(myIntent)
-        }
+        val myIntent = Intent(this, Authentication::class.java)
 
+        user_button.setOnClickListener{ startActivity(myIntent) }
+        admin_button.setOnClickListener{ startActivity(myIntent) }
     }
 }
