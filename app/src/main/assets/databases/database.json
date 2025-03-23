@@ -1,0 +1,81 @@
+{
+  "type": "database",
+  "name": "UserDatabase2",
+  "objects": [
+    {
+      "type": "table",
+      "database": null,
+      "name": "android_metadata",
+      "withoutRowId": false,
+      "strict": false,
+      "ddl": "CREATE TABLE android_metadata (locale TEXT)",
+      "columns": [
+        {
+          "name": "locale",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        [
+          "ru_RU"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "database": null,
+      "name": "users",
+      "withoutRowId": false,
+      "strict": false,
+      "ddl": "CREATE TABLE users (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    email TEXT NOT NULL UNIQUE,\n    password TEXT NOT NULL\n)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "constraints": [
+            {
+              "type": "PRIMARY KEY",
+              "definition": "PRIMARY KEY AUTOINCREMENT"
+            }
+          ]
+        },
+        {
+          "name": "email",
+          "type": "TEXT",
+          "constraints": [
+            {
+              "type": "NOT NULL",
+              "definition": "NOT NULL "
+            },
+            {
+              "type": "UNIQUE",
+              "definition": "UNIQUE"
+            }
+          ]
+        },
+        {
+          "name": "password",
+          "type": "TEXT",
+          "constraints": [
+            {
+              "type": "NOT NULL",
+              "definition": "NOT NULL\n"
+            }
+          ]
+        }
+      ],
+      "rows": [
+        [
+          1,
+          "test",
+          "123456"
+        ],
+        [
+          2,
+          "qwerty",
+          "123"
+        ]
+      ]
+    }
+  ]
+}

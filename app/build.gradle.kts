@@ -43,6 +43,7 @@ android {
 dependencies {
     implementation(libs.glide)
     annotationProcessor(libs.glideCompiler)
+    implementation(libs.sqliteassethelper)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.v493)
