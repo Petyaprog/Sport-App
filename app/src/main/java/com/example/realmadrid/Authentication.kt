@@ -25,13 +25,10 @@ class Authentication : AppCompatActivity() {
         etPassword = findViewById(R.id.password)
         btnLogin = findViewById(R.id.loginButton)
         signupText = findViewById(R.id.signupText)
-
-        // Инициализация DatabaseHelper
         dbHelper = DatabaseHelper(this)
+
         val myIntent = Intent(this, MainActivity::class.java)
         val myIntent2 = Intent(this, Registration::class.java)
-
-        // Обновление базы данных из внешнего источника (например, при запуске
 
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -50,10 +47,8 @@ class Authentication : AppCompatActivity() {
                 }
             }
         }
-
         signupText.setOnClickListener{ startActivity(myIntent2) }
     }
-
     override fun onDestroy() {
         dbHelper.close()
         super.onDestroy()

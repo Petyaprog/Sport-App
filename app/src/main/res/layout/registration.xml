@@ -36,7 +36,7 @@
                 android:textColor="@color/purple"/>
 
             <EditText
-                android:id="@+id/mail"
+                android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="40dp"
@@ -48,7 +48,7 @@
                 android:textColorHighlight="@color/cardview_dark_background" />
 
             <EditText
-                android:id="@+id/username"
+                android:id="@+id/username_register"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
@@ -62,7 +62,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:id="@+id/password"
+                android:id="@+id/password_register"
                 android:background="@drawable/custom_edittext"
                 android:drawablePadding="8dp"
                 android:hint="Password"
