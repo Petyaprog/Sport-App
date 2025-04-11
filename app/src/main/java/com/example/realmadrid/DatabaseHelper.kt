@@ -9,11 +9,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "UserDatabase.db"
-        private const val DATABASE_VERSION = 2  // Увеличьте версию!
+        private const val DATABASE_VERSION = 2
         private const val TABLE_USERS = "users"
         private const val COLUMN_ID = "id"
         private const val COLUMN_EMAIL = "email"
-        private const val COLUMN_USERNAME = "username"  // Фиксим имя столбца
+        private const val COLUMN_USERNAME = "username"
         private const val COLUMN_PASSWORD = "password"
     }
 
@@ -43,11 +43,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         return exists
     }
+
     fun checkUser(username: String, password: String): Boolean {
         val db = readableDatabase
-        val query = "Username = ? AND password = ?"
+        val query = "$COLUMN_USERNAME = ? AND $COLUMN_PASSWORD = ?"
         val queryArgs = arrayOf(username, password)
-        val cursor = db.query("users", null, query, queryArgs, null, null, null)
+        val cursor = db.query(TABLE_USERS, null, query, queryArgs, null, null, null)
         val exists = cursor.count > 0
         cursor.close()
         return exists
@@ -55,7 +56,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     fun isEmailExists(email: String): Boolean {
         val db = readableDatabase
-        val query = "SELECT * FROM users WHERE email = ?"
+        val query = "SELECT * FROM $TABLE_USERS WHERE $COLUMN_EMAIL = ?"
         val cursor = db.rawQuery(query, arrayOf(email))
         val exists = cursor.count > 0
         cursor.close()
@@ -65,10 +66,17 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun addUser(email: String, username: String, password: String): Long {
         val db = writableDatabase
         val values = ContentValues().apply {
-            put("email", email)
-            put("username", username)
-            put("password", password)
+            put(COLUMN_EMAIL, email)
+            put(COLUMN_USERNAME, username)
+            put(COLUMN_PASSWORD, password)
         }
-        return db.insert("users", null, values)
+        return db.insert(TABLE_USERS, null, values)
+    }
+
+    // Новая функция для удаления пользователя
+    fun deleteUser(username: String): Int {
+        val db = writableDatabase
+        // Удаляем пользователя по username и возвращаем количество удаленных строк
+        return db.delete(TABLE_USERS, "$COLUMN_USERNAME = ?", arrayOf(username))
     }
 }

@@ -32,32 +32,32 @@ class Registration : AppCompatActivity() {
         repeat_password = findViewById(R.id.repeat_password)
         dbHelper = DatabaseHelper(this)
 
-        registerButton.setOnClickListener{
-            val email = email.text.toString().trim()
-            val username = username.text.toString().trim()
-            val password = password.text.toString().trim()
-            val repeatPassword = repeat_password.text.toString().trim()
+        registerButton.setOnClickListener {
+            val emailText = email.text.toString().trim()
+            val usernameText = username.text.toString().trim()
+            val passwordText = password.text.toString().trim()
+            val repeatPasswordText = repeat_password.text.toString().trim()
             val validDomains = listOf("@gmail.com", "@mail.ru", "@yandex.ru")
 
             when {
-                TextUtils.isEmpty(email) || TextUtils.isEmpty(username) ||
-                        TextUtils.isEmpty(password) || TextUtils.isEmpty(repeatPassword) -> {
+                TextUtils.isEmpty(emailText) || TextUtils.isEmpty(usernameText) ||
+                        TextUtils.isEmpty(passwordText) || TextUtils.isEmpty(repeatPasswordText) -> {
                     Toast.makeText(this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
                 }
-                !validDomains.any { email.contains(it) } -> {
+                !validDomains.any { emailText.contains(it) } -> {
                     Toast.makeText(this, "Введите корректный email (например, example@gmail.com)", Toast.LENGTH_SHORT).show()
                 }
-                password.length < 6 -> {
+                passwordText.length < 6 -> {
                     Toast.makeText(this, "Пароль должен быть не менее 6 символов", Toast.LENGTH_SHORT).show()
                 }
-                password != repeatPassword -> {
+                passwordText != repeatPasswordText -> {
                     Toast.makeText(this, "Пароли не совпадают", Toast.LENGTH_SHORT).show()
                 }
-                dbHelper.isEmailExists(email) -> {
+                dbHelper.isEmailExists(emailText) -> {
                     Toast.makeText(this, "Этот email уже зарегистрирован", Toast.LENGTH_SHORT).show()
                 }
                 else -> {
-                    registerUser(email, username, password)
+                    registerUser(emailText, usernameText, passwordText)
                 }
             }
         }
