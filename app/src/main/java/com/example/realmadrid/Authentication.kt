@@ -7,6 +7,12 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.realmadrid.database.AppDatabase.DatabaseProvider
+import com.example.realmadrid.database.UserRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class Authentication : AppCompatActivity() {
 
@@ -14,74 +20,73 @@ class Authentication : AppCompatActivity() {
     private lateinit var etPassword: EditText
     private lateinit var btnLogin: Button
     private lateinit var signupText: TextView
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var userRepository: UserRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        try {
-            supportActionBar?.hide()
-            setContentView(R.layout.authentication)
+        supportActionBar?.hide()
+        setContentView(R.layout.authentication)
 
-            etEmail = findViewById(R.id.username)
-            etPassword = findViewById(R.id.password)
-            btnLogin = findViewById(R.id.loginButton)
-            signupText = findViewById(R.id.signupText)
-            dbHelper = DatabaseHelper(this)
+        initViews()
+        setupDatabase()
+        setupClickListeners()
+    }
 
-            val myIntent = Intent(this, MainActivity::class.java)
-            val myIntent2 = Intent(this, Registration::class.java)
+    private fun initViews() {
+        etEmail = findViewById(R.id.username)
+        etPassword = findViewById(R.id.password)
+        btnLogin = findViewById(R.id.loginButton)
+        signupText = findViewById(R.id.signupText)
+    }
 
-//            val rowsDeleted = dbHelper.deleteUser("qwerty")
-//        if (rowsDeleted > 0) {
-//            Toast.makeText(this, "Пользователь успешно удален", Toast.LENGTH_SHORT).show()
-//        } else {
-//            Toast.makeText(this, "Пользователь не найден", Toast.LENGTH_SHORT).show()
-//        }
+    private fun setupDatabase() {
+        DatabaseProvider.init(applicationContext)
+        userRepository = DatabaseProvider.getUserRepository()
+    }
 
-            btnLogin.setOnClickListener {
-                try {
-                    val email = etEmail.text.toString().trim()
-                    val password = etPassword.text.toString().trim()
+    private fun setupClickListeners() {
+        val mainIntent = Intent(this, MainActivity::class.java)
+        val registrationIntent = Intent(this, Registration::class.java)
 
-                    if (email.isEmpty() || password.isEmpty()) {
-                        Toast.makeText(this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
-                    } else {
-                        // Проверка пользователя в базе данных
-                        if (dbHelper.checkUser(email, password)) {
-                            Toast.makeText(this, "Вход выполнен успешно", Toast.LENGTH_SHORT).show()
-                            startActivity(myIntent)
-                            finish()
-                        } else {
-                            Toast.makeText(this, "Неверный email или пароль", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(this, "Ошибка при входе: ${e.message}", Toast.LENGTH_SHORT).show()
-                    e.printStackTrace()
-                }
+        btnLogin.setOnClickListener {
+            val email = etEmail.text.toString().trim()
+            val password = etPassword.text.toString().trim()
+
+            if (email.isEmpty() || password.isEmpty()) {
+                showToast("Пожалуйста, заполните все поля")
+                return@setOnClickListener
             }
 
-            signupText.setOnClickListener {
-                try {
-                    startActivity(myIntent2)
-                } catch (e: Exception) {
-                    Toast.makeText(this, "Ошибка при переходе к регистрации: ${e.message}", Toast.LENGTH_SHORT).show()
-                    e.printStackTrace()
-                }
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "Ошибка инициализации: ${e.message}", Toast.LENGTH_SHORT).show()
-            e.printStackTrace()
-            finish() // Закрываем активность при критической ошибке
+            authenticateUser(email, password, mainIntent)
+        }
+
+        signupText.setOnClickListener {
+            startActivity(registrationIntent)
         }
     }
 
-    override fun onDestroy() {
-        try {
-            dbHelper.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
+    private fun authenticateUser(email: String, password: String, successIntent: Intent) {
+        lifecycleScope.launch {
+            try {
+                val isValidUser = withContext(Dispatchers.IO) {
+                    userRepository.checkUser(email, password)
+                }
+
+                if (isValidUser) {
+                    showToast("Вход выполнен успешно")
+                    startActivity(successIntent)
+                    finish()
+                } else {
+                    showToast("Неверный email или пароль")
+                }
+            } catch (e: Exception) {
+                showToast("Ошибка при входе: ${e.localizedMessage}")
+                e.printStackTrace()
+            }
         }
-        super.onDestroy()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

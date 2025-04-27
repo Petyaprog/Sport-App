@@ -22,9 +22,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val button = view.findViewById<Button>(R.id.button)
-        button.setOnClickListener {
-            Toast.makeText(requireContext(), "Button Clicked!", Toast.LENGTH_SHORT).show()
-        }
+
     }
 }

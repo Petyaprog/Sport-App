@@ -1,6 +1,6 @@
 [versions]
 glide = "4.12.0"
-coreKtxVersion = "1.15.0"
+coreKtxVersion = "1.16.0"
 kotlinxCoroutinesAndroid = "1.7.3"
 lifecycleLivedataKtxVersion = "2.8.7"
 lifecycleRuntimeKtx = "2.8.7"
@@ -11,9 +11,11 @@ retrofit = "2.9.0"
 okhttp = "4.9.3"
 kotlinx-coroutines = "1.7.3"
 lifecycle-runtime = "2.8.7"
-agp = "8.8.2"
-kotlin = "1.9.24"
-coreKtx = "1.15.0"
+agp = "8.9.2"
+kotlin = "2.1.20"
+ksp = "2.1.20-1.0.32"
+room = "2.7.1"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -55,7 +57,12 @@ androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifec
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
 
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+
+
 [plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-

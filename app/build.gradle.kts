@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -16,6 +17,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
 
     buildTypes {
         release {
@@ -49,6 +51,10 @@ dependencies {
     implementation(libs.okhttp.v493)
     implementation(libs.logging.interceptor.v493)
     implementation(libs.kotlinx.coroutines.android.v160)
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     // Android Lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx.v251)

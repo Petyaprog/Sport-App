@@ -8,16 +8,21 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import kotlin.compareTo
+import androidx.lifecycle.lifecycleScope
+import com.example.realmadrid.database.AppDatabase
+import com.example.realmadrid.database.UserRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class Registration : AppCompatActivity() {
 
     private lateinit var email: EditText
     private lateinit var username: EditText
     private lateinit var password: EditText
-    private lateinit var repeat_password: EditText
+    private lateinit var repeatPassword: EditText
     private lateinit var registerButton: Button
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var userRepository: UserRepository
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,64 +30,93 @@ class Registration : AppCompatActivity() {
         supportActionBar?.hide()
         setContentView(R.layout.registration)
 
+        // Инициализация базы данных и репозитория
+        AppDatabase.DatabaseProvider.init(applicationContext)
+        userRepository = AppDatabase.DatabaseProvider.getUserRepository()
+
+        initViews()
+        setupRegisterButton()
+    }
+
+    private fun initViews() {
         registerButton = findViewById(R.id.registerButton)
         email = findViewById(R.id.email)
         username = findViewById(R.id.username_register)
         password = findViewById(R.id.password_register)
-        repeat_password = findViewById(R.id.repeat_password)
-        dbHelper = DatabaseHelper(this)
+        repeatPassword = findViewById(R.id.repeat_password)
+    }
 
+    private fun setupRegisterButton() {
         registerButton.setOnClickListener {
             val emailText = email.text.toString().trim()
             val usernameText = username.text.toString().trim()
             val passwordText = password.text.toString().trim()
-            val repeatPasswordText = repeat_password.text.toString().trim()
+            val repeatPasswordText = repeatPassword.text.toString().trim()
             val validDomains = listOf("@gmail.com", "@mail.ru", "@yandex.ru")
 
             when {
                 TextUtils.isEmpty(emailText) || TextUtils.isEmpty(usernameText) ||
                         TextUtils.isEmpty(passwordText) || TextUtils.isEmpty(repeatPasswordText) -> {
-                    Toast.makeText(this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
+                    showToast("Пожалуйста, заполните все поля")
                 }
                 !validDomains.any { emailText.contains(it) } -> {
-                    Toast.makeText(this, "Введите корректный email (например, example@gmail.com)", Toast.LENGTH_SHORT).show()
+                    showToast("Введите корректный email (например, example@gmail.com)")
                 }
                 passwordText.length < 6 -> {
-                    Toast.makeText(this, "Пароль должен быть не менее 6 символов", Toast.LENGTH_SHORT).show()
+                    showToast("Пароль должен быть не менее 6 символов")
                 }
                 passwordText != repeatPasswordText -> {
-                    Toast.makeText(this, "Пароли не совпадают", Toast.LENGTH_SHORT).show()
-                }
-                dbHelper.isEmailExists(emailText) -> {
-                    Toast.makeText(this, "Этот email уже зарегистрирован", Toast.LENGTH_SHORT).show()
+                    showToast("Пароли не совпадают")
                 }
                 else -> {
-                    registerUser(emailText, usernameText, passwordText)
+                    checkAndRegisterUser(emailText, usernameText, passwordText)
                 }
             }
         }
     }
 
-    private fun registerUser(email: String, username: String, password: String) {
-        // Добавляем проверку на уникальность username
-        if (dbHelper.isUsernameExists(username)) {
-            Toast.makeText(this, "Этот логин уже занят", Toast.LENGTH_SHORT).show()
-            return
-        }
+    private fun checkAndRegisterUser(email: String, username: String, password: String) {
+        lifecycleScope.launch {
+            try {
+                // Проверка email и username в базе данных
+                val emailExists = withContext(Dispatchers.IO) {
+                    userRepository.isEmailExists(email)
+                }
 
-        val success = dbHelper.addUser(email, username, password)
-        if (success != -1L) {
-            Toast.makeText(this, "Регистрация успешна!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, Authentication::class.java))
-            finish()
-        } else {
-            Toast.makeText(this, "Ошибка: возможно, email или логин уже заняты", Toast.LENGTH_SHORT).show()
+                if (emailExists) {
+                    showToast("Этот email уже зарегистрирован")
+                    return@launch
+                }
+
+                val usernameExists = withContext(Dispatchers.IO) {
+                    userRepository.isUsernameExists(username)
+                }
+
+                if (usernameExists) {
+                    showToast("Этот логин уже занят")
+                    return@launch
+                }
+
+                // Регистрация пользователя
+                val userId = withContext(Dispatchers.IO) {
+                    userRepository.addUser(email, username, password)
+                }
+
+                if (userId > 0) {
+                    showToast("Регистрация успешна!")
+                    startActivity(Intent(this@Registration, Authentication::class.java))
+                    finish()
+                } else {
+                    showToast("Ошибка при регистрации")
+                }
+            } catch (e: Exception) {
+                showToast("Ошибка: ${e.message}")
+                e.printStackTrace()
+            }
         }
     }
 
-    override fun onDestroy() {
-        dbHelper.close()
-        super.onDestroy()
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
-
