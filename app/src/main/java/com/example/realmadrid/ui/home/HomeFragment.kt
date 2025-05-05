@@ -5,94 +5,68 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TableLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.realmadrid.R
+import com.example.realmadrid.databinding.FragmentHomeBinding
+import com.example.realmadrid.databinding.ItemMatchHistoryBinding
+import com.example.realmadrid.databinding.StatisticsMatchBinding
 import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
-    private lateinit var matchScoreTextView: TextView
-    private lateinit var goalsTextView: TextView
-    private lateinit var homeTeamLogo: ImageView
-    private lateinit var awayTeamLogo: ImageView
-    private lateinit var historyButton: Button
-    private lateinit var statsButton: Button
-    private lateinit var historyLayout: LinearLayout
-    private lateinit var statisticsLayout: LinearLayout
-    private lateinit var league_name: TextView
-    private lateinit var timeTextView: TextView
-    private lateinit var searchLayout: LinearLayout
-    private lateinit var searchEditText: EditText
-    private lateinit var searchButton: Button
-    private lateinit var showAllButton: Button
-
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
     private var allMatches: List<Match> = emptyList()
     private var currentMatchIndex = 0
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
-        matchScoreTextView = view.findViewById(R.id.match_score_text_view)
-        goalsTextView = view.findViewById(R.id.goals_text_view)
-        homeTeamLogo = view.findViewById(R.id.home_team_logo)
-        awayTeamLogo = view.findViewById(R.id.away_team_logo)
-        historyButton = view.findViewById(R.id.history_button)
-        historyLayout = view.findViewById(R.id.history_layout)
-        statsButton = view.findViewById(R.id.stats_button)
-        statisticsLayout = view.findViewById(R.id.Statistics_layout)
-        league_name = view.findViewById(R.id.league_name) // Находим textView2
-        timeTextView = view.findViewById(R.id.time) // Находим time
-        searchLayout = view.findViewById(R.id.search_layout)
-        searchEditText = view.findViewById(R.id.search_edit_text)
-        searchButton = view.findViewById(R.id.search_button)
-        showAllButton = view.findViewById(R.id.show_all_button)
-
-        return view
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupClickListeners()
         loadMatches()
-        historyButton.setOnClickListener {
+    }
+
+    private fun setupClickListeners() {
+        binding.historyButton.setOnClickListener {
             showHistory()
-            // Показываем панель поиска
-            searchLayout.visibility = View.VISIBLE
-        }
-        statsButton.setOnClickListener {
-            showStats()
-            // Скрываем панель поиска
-            searchLayout.visibility = View.GONE
+            binding.searchLayout.visibility = View.VISIBLE
         }
 
-        searchButton.setOnClickListener {
-            val query = searchEditText.text.toString().trim()
+        binding.statsButton.setOnClickListener {
+            showStats()
+            binding.searchLayout.visibility = View.GONE
+        }
+
+        binding.searchButton.setOnClickListener {
+            val query = binding.searchEditText.text.toString().trim()
             if (query.isNotEmpty()) {
                 filterMatches(query)
             } else {
                 Toast.makeText(requireContext(), "Введите название команды", Toast.LENGTH_SHORT).show()
             }
         }
-        showAllButton.setOnClickListener {
+
+        binding.showAllButton.setOnClickListener {
             showAllMatches()
         }
     }
 
     private fun filterMatches(query: String) {
         val filteredMatches = allMatches.filter {
-            it.match_hometeam_name.contains(query, ignoreCase = true) == true ||
-                    it.match_awayteam_name.contains(query, ignoreCase = true) == true
+            it.match_hometeam_name.contains(query, ignoreCase = true) ||
+                    it.match_awayteam_name.contains(query, ignoreCase = true)
         }
 
         if (filteredMatches.isEmpty()) {
@@ -103,14 +77,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun showFilteredMatches(matches: List<Match>) {
-        historyLayout.removeAllViews()
+        binding.historyLayout.removeAllViews()
         matches.forEach { match ->
             addMatchToHistoryLayout(match)
         }
     }
 
     private fun showAllMatches() {
-        historyLayout.removeAllViews()
+        binding.historyLayout.removeAllViews()
         allMatches.forEach { match ->
             addMatchToHistoryLayout(match)
         }
@@ -138,28 +112,18 @@ class HomeFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUI(match: Match) {
-        // Устанавливаем название лиги
-        league_name.text = match.league_name
+        binding.leagueName.text = match.league_name
+        binding.time.text = if (match.match_live == "0") "" else match.match_status
 
-        // Устанавливаем текущую минуту матча
-        timeTextView.text = when {
-            match.match_live == "0" -> ""
-            else -> match.match_status // Текущая минута матча
-        }
-
-        // Устанавливаем счет матча
-        val scoreText = if (match.match_status == "") {
+        binding.matchScoreTextView.text = if (match.match_status == "") {
             "${match.match_date} ${match.match_time}"
         } else {
             "${match.match_hometeam_name} ${match.match_hometeam_score} - ${match.match_awayteam_score} ${match.match_awayteam_name}"
         }
-        matchScoreTextView.text = scoreText
 
-        // Загружаем логотипы команд
-        Glide.with(requireContext()).load(match.team_home_badge).into(homeTeamLogo)
-        Glide.with(requireContext()).load(match.team_away_badge).into(awayTeamLogo)
+        Glide.with(requireContext()).load(match.team_home_badge).into(binding.homeTeamLogo)
+        Glide.with(requireContext()).load(match.team_away_badge).into(binding.awayTeamLogo)
 
-        // Устанавливаем список голов
         val goalsText = match.goalscorer.joinToString("\n") { goal ->
             when {
                 !goal.home_scorer.isNullOrEmpty() -> "⚽ ${goal.time}' ${goal.home_scorer} (${match.match_hometeam_name}) ${goal.info}"
@@ -167,9 +131,8 @@ class HomeFragment : Fragment() {
                 else -> ""
             }
         }.trim()
-        goalsTextView.text = goalsText
+        binding.goalsTextView.text = goalsText
 
-        // Переход к следующему матчу, если текущий завершен
         if (match.match_status == "Finished" && currentMatchIndex < allMatches.size - 1) {
             currentMatchIndex++
             updateUI(allMatches[currentMatchIndex])
@@ -178,71 +141,37 @@ class HomeFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun addMatchToHistoryLayout(match: Match) {
-        val matchView = layoutInflater.inflate(R.layout.item_match_history, historyLayout, false)
-        val homeTeamLogo = matchView.findViewById<ImageView>(R.id.history_home_team_logo)
-        val awayTeamLogo = matchView.findViewById<ImageView>(R.id.history_away_team_logo)
-        val scoreTextView = matchView.findViewById<TextView>(R.id.history_score_text_view)
+        val itemBinding = ItemMatchHistoryBinding.inflate(layoutInflater)
+        Glide.with(requireContext()).load(match.team_home_badge).into(itemBinding.historyHomeTeamLogo)
+        Glide.with(requireContext()).load(match.team_away_badge).into(itemBinding.historyAwayTeamLogo)
+        itemBinding.historyScoreTextView.text =
+            "${match.match_hometeam_name} ${match.match_hometeam_score} - ${match.match_awayteam_score} ${match.match_awayteam_name}"
 
-        Glide.with(requireContext()).load(match.team_home_badge).into(homeTeamLogo)
-        Glide.with(requireContext()).load(match.team_away_badge).into(awayTeamLogo)
-        scoreTextView.text = "${match.match_hometeam_name} ${match.match_hometeam_score} - ${match.match_awayteam_score} ${match.match_awayteam_name}"
-
-        historyLayout.addView(matchView)
+        binding.historyLayout.addView(itemBinding.root)
     }
 
-    @SuppressLint("SetTextI18n", "MissingInflatedId")
     private fun showHistory() {
-        statisticsLayout.visibility = View.GONE
-        historyLayout.visibility = View.VISIBLE
-        historyLayout.removeAllViews()
+        binding.StatisticsLayout.visibility = View.GONE
+        binding.historyLayout.visibility = View.VISIBLE
+        binding.historyLayout.removeAllViews()
+
         allMatches.forEach { match ->
-            val matchView = layoutInflater.inflate(R.layout.item_match_history, historyLayout, false)
-            val homeTeamLogo = matchView.findViewById<ImageView>(R.id.history_home_team_logo)
-            val awayTeamLogo = matchView.findViewById<ImageView>(R.id.history_away_team_logo)
-            val scoreTextView = matchView.findViewById<TextView>(R.id.history_score_text_view)
-
-            Glide.with(requireContext()).load(match.team_home_badge).into(homeTeamLogo)
-            Glide.with(requireContext()).load(match.team_away_badge).into(awayTeamLogo)
-            scoreTextView.text = "${match.match_hometeam_name} ${match.match_hometeam_score} - ${match.match_awayteam_score} ${match.match_awayteam_name}"
-
-            historyLayout.addView(matchView)
+            addMatchToHistoryLayout(match)
         }
     }
 
-
-    @SuppressLint("SetTextI18n", "MissingInflatedId")
     private fun showStats() {
-        historyLayout.visibility = View.GONE
-        statisticsLayout.visibility = View.VISIBLE
-        statisticsLayout.removeAllViews()
+        binding.historyLayout.visibility = View.GONE
+        binding.StatisticsLayout.visibility = View.VISIBLE
+        binding.StatisticsLayout.removeAllViews()
 
-        // Инициализация элементов интерфейса
-        val statsView = layoutInflater.inflate(R.layout.statistics_match, statisticsLayout, false)
-//        val statsTable = statsView.findViewById<TableLayout>(R.id.statistics_table)
-//        val statsHomeTeamLogo = statsView.findViewById<ImageView>(R.id.stats_home_team_logo)
-//        val statsAwayTeamLogo = statsView.findViewById<ImageView>(R.id.stats_away_team_logo)
-//        val nameStadium = statsView.findViewById<TextView>(R.id.name_stadium)
+        val statsBinding = StatisticsMatchBinding.inflate(layoutInflater)
+        // Здесь можно заполнить данные статистики, если они есть
+        binding.StatisticsLayout.addView(statsBinding.root)
+    }
 
-        // Загрузка логотипов команд
-//        Glide.with(requireContext()).load(allMatches[currentMatchIndex].team_home_badge).into(statsHomeTeamLogo)
-//        Glide.with(requireContext()).load(allMatches[currentMatchIndex].team_away_badge).into(statsAwayTeamLogo)
-//
-//        // Установка названия стадиона
-//        nameStadium.text = allMatches[currentMatchIndex].match_stadium
-
-        // Заполнение данных статистики
-//        allMatches[currentMatchIndex].statistics.forEach { stat ->
-//            val tableRow = layoutInflater.inflate(R.layout.statistics_match, statsTable, false)
-//            val indicatorStats = tableRow.findViewById<TextView>(R.id.indicator_stats)
-//            val indicatorHomeTeam = tableRow.findViewById<TextView>(R.id.indicator_home_team)
-//            val indicatorAwayTeam = tableRow.findViewById<TextView>(R.id.indicator_away_team)
-//
-//            indicatorStats.text = stat.type
-//            indicatorHomeTeam.text = stat.home
-//            indicatorAwayTeam.text = stat.away
-//
-//            statsTable.addView(tableRow)
-//        }
-//        statisticsLayout.addView(statsView)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         // Связываем BottomNavigationView с NavController
         binding.bottomNavigation.setupWithNavController(navController)
 
-        // Убираем ActionBar (если не нужен)
+        // Убираем ActionBar
         supportActionBar?.hide()
     }
 

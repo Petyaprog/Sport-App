@@ -32,6 +32,36 @@
                 android:textStyle="bold"
                 android:textColor="@color/purple"/>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="20dp">
+
+                <Button
+                    android:id="@+id/userRoleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="User"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/gray"
+                    app:cornerRadius="20dp"/>
+
+                <Button
+                    android:id="@+id/adminRoleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Admin"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/gray"
+                    app:cornerRadius="20dp"/>
+            </LinearLayout>
+
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -42,7 +72,7 @@
                 android:padding="8dp"
                 android:textColor="@color/black"
                 android:textColorHighlight="@color/cardview_dark_background"
-                android:layout_marginTop="40dp"/>
+                android:layout_marginTop="20dp"/>
 
             <EditText
                 android:layout_width="match_parent"
@@ -67,7 +97,7 @@
                 android:layout_marginTop="30dp"
                 android:background="@drawable/custom_edittext"
                 android:backgroundTint="@color/purple"
-                app:cornerRadius = "20dp"/>
+                app:cornerRadius="20dp"/>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -1,42 +1,35 @@
 package com.example.realmadrid
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.realmadrid.database.AppDatabase.DatabaseProvider
 import com.example.realmadrid.database.UserRepository
+import com.example.realmadrid.databinding.AuthenticationBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class Authentication : AppCompatActivity() {
 
-    private lateinit var etEmail: EditText
-    private lateinit var etPassword: EditText
-    private lateinit var btnLogin: Button
-    private lateinit var signupText: TextView
+    private lateinit var binding: AuthenticationBinding
     private lateinit var userRepository: UserRepository
+    private var selectedRole: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = AuthenticationBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar?.hide()
-        setContentView(R.layout.authentication)
 
-        initViews()
         setupDatabase()
+        setupRoleSelection()
         setupClickListeners()
-    }
-
-    private fun initViews() {
-        etEmail = findViewById(R.id.username)
-        etPassword = findViewById(R.id.password)
-        btnLogin = findViewById(R.id.loginButton)
-        signupText = findViewById(R.id.signupText)
     }
 
     private fun setupDatabase() {
@@ -44,40 +37,72 @@ class Authentication : AppCompatActivity() {
         userRepository = DatabaseProvider.getUserRepository()
     }
 
+    private fun setupRoleSelection() {
+        binding.userRoleButton.setOnClickListener {
+            selectedRole = "user"
+            updateRoleUI()
+        }
+
+        binding.adminRoleButton.setOnClickListener {
+            selectedRole = "admin"
+            updateRoleUI()
+        }
+    }
+
+    private fun updateRoleUI() {
+        val selectedColor = ContextCompat.getColor(this, R.color.purple)
+        val unselectedColor = ContextCompat.getColor(this, R.color.gray)
+
+        binding.userRoleButton.backgroundTintList = ColorStateList.valueOf(
+            if (selectedRole == "user") selectedColor else unselectedColor
+        )
+
+        binding.adminRoleButton.backgroundTintList = ColorStateList.valueOf(
+            if (selectedRole == "admin") selectedColor else unselectedColor
+        )
+
+        binding.signupText.visibility = if (selectedRole == "admin") View.GONE else View.VISIBLE
+    }
+
     private fun setupClickListeners() {
         val mainIntent = Intent(this, MainActivity::class.java)
         val registrationIntent = Intent(this, Registration::class.java)
 
-        btnLogin.setOnClickListener {
-            val email = etEmail.text.toString().trim()
-            val password = etPassword.text.toString().trim()
+        binding.loginButton.setOnClickListener {
+            val email = binding.username.text.toString().trim()
+            val password = binding.password.text.toString().trim()
 
-            if (email.isEmpty() || password.isEmpty()) {
-                showToast("Пожалуйста, заполните все поля")
-                return@setOnClickListener
+            when {
+                email.isEmpty() || password.isEmpty() -> {
+                    showToast("Пожалуйста, заполните все поля")
+                }
+                selectedRole == null -> {
+                    showToast("Пожалуйста, выберите роль (User/Admin)")
+                }
+                else -> {
+                    authenticateUser(email, password, selectedRole!!, mainIntent)
+                }
             }
-
-            authenticateUser(email, password, mainIntent)
         }
 
-        signupText.setOnClickListener {
+        binding.signupText.setOnClickListener {
             startActivity(registrationIntent)
         }
     }
 
-    private fun authenticateUser(email: String, password: String, successIntent: Intent) {
+    private fun authenticateUser(email: String, password: String, role: String, successIntent: Intent) {
         lifecycleScope.launch {
             try {
-                val isValidUser = withContext(Dispatchers.IO) {
-                    userRepository.checkUser(email, password)
+                val isAuthenticated = withContext(Dispatchers.IO) {
+                    userRepository.loginUser(email, password, role)
                 }
 
-                if (isValidUser) {
-                    showToast("Вход выполнен успешно")
+                if (isAuthenticated) {
+                    showToast("Вход выполнен успешно как $role")
                     startActivity(successIntent)
                     finish()
                 } else {
-                    showToast("Неверный email или пароль")
+                    showToast("Неверные учетные данные или роль")
                 }
             } catch (e: Exception) {
                 showToast("Ошибка при входе: ${e.localizedMessage}")
@@ -88,5 +113,12 @@ class Authentication : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycleScope.launch(Dispatchers.IO) {
+            userRepository.logout()
+        }
     }
 }

@@ -1,7 +1,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1A59A3">
@@ -23,7 +22,7 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="74dp"
+                android:layout_height="60dp"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
             <androidx.cardview.widget.CardView
@@ -42,7 +41,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="16dp"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -54,7 +53,7 @@
 
                     <TextView
                         android:id="@+id/time"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text=""
@@ -69,7 +68,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:textColor="@android:color/black"
-                        android:textSize="20sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -88,6 +87,13 @@
                     android:layout_gravity="end|bottom"
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="5dp" />
+
+                <TextView
+                    android:id="@+id/league_name"
+                    android:layout_width="412dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
             </androidx.cardview.widget.CardView>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -139,7 +145,7 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="600dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -209,15 +215,4 @@
                 android:visibility="gone"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <TextView
-        android:id="@+id/league_name"
-        android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_anchor="@+id/appBarLayout"
-        app:layout_anchorGravity="top|center" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

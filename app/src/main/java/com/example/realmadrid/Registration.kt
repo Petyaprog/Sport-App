@@ -1,66 +1,86 @@
 package com.example.realmadrid
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.realmadrid.database.AppDatabase
 import com.example.realmadrid.database.UserRepository
+import com.example.realmadrid.databinding.RegistrationBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
+import java.util.Locale
 
 class Registration : AppCompatActivity() {
 
-    private lateinit var email: EditText
-    private lateinit var username: EditText
-    private lateinit var password: EditText
-    private lateinit var repeatPassword: EditText
-    private lateinit var registerButton: Button
+    private lateinit var binding: RegistrationBinding
     private lateinit var userRepository: UserRepository
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = RegistrationBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         supportActionBar?.hide()
-        setContentView(R.layout.registration)
 
         // Инициализация базы данных и репозитория
         AppDatabase.DatabaseProvider.init(applicationContext)
         userRepository = AppDatabase.DatabaseProvider.getUserRepository()
 
-        initViews()
+        setupDatePicker()
         setupRegisterButton()
     }
 
-    private fun initViews() {
-        registerButton = findViewById(R.id.registerButton)
-        email = findViewById(R.id.email)
-        username = findViewById(R.id.username_register)
-        password = findViewById(R.id.password_register)
-        repeatPassword = findViewById(R.id.repeat_password)
+    private fun setupDatePicker() {
+        binding.birthDateContainer.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            DatePickerDialog(
+                this,
+                { _, selectedYear, selectedMonth, selectedDay ->
+                    val formattedDate = String.format(
+                        Locale.getDefault(),
+                        "%02d/%02d/%d", selectedDay, selectedMonth + 1, selectedYear
+                    )
+                    binding.birthDateText.text = formattedDate
+                },
+                year, month, day
+            ).apply {
+                datePicker.maxDate = calendar.timeInMillis
+                show()
+            }
+        }
     }
 
     private fun setupRegisterButton() {
-        registerButton.setOnClickListener {
-            val emailText = email.text.toString().trim()
-            val usernameText = username.text.toString().trim()
-            val passwordText = password.text.toString().trim()
-            val repeatPasswordText = repeatPassword.text.toString().trim()
+        binding.registerButton.setOnClickListener {
+            val emailText = binding.email.text.toString().trim()
+            val telephoneText = binding.telephone.text.toString().trim()
+            val usernameText = binding.usernameRegister.text.toString().trim()
+            val passwordText = binding.passwordRegister.text.toString().trim()
+            val repeatPasswordText = binding.repeatPassword.text.toString().trim()
+            val birthDate = binding.birthDateText.text.toString().trim()
             val validDomains = listOf("@gmail.com", "@mail.ru", "@yandex.ru")
 
             when {
                 TextUtils.isEmpty(emailText) || TextUtils.isEmpty(usernameText) ||
-                        TextUtils.isEmpty(passwordText) || TextUtils.isEmpty(repeatPasswordText) -> {
+                        TextUtils.isEmpty(passwordText) || TextUtils.isEmpty(repeatPasswordText) ||
+                        TextUtils.isEmpty(telephoneText) || TextUtils.isEmpty(birthDate) -> {
                     showToast("Пожалуйста, заполните все поля")
                 }
                 !validDomains.any { emailText.contains(it) } -> {
                     showToast("Введите корректный email (например, example@gmail.com)")
+                }
+                !isValidPhoneNumber(telephoneText) -> {
+                    showToast("Введите корректный номер телефона (начинается с +7 или 8, 11 цифр)")
                 }
                 passwordText.length < 6 -> {
                     showToast("Пароль должен быть не менее 6 символов")
@@ -69,13 +89,25 @@ class Registration : AppCompatActivity() {
                     showToast("Пароли не совпадают")
                 }
                 else -> {
-                    checkAndRegisterUser(emailText, usernameText, passwordText)
+                    checkAndRegisterUser(emailText, telephoneText, birthDate, usernameText, passwordText)
                 }
             }
         }
     }
 
-    private fun checkAndRegisterUser(email: String, username: String, password: String) {
+    private fun isValidPhoneNumber(phone: String): Boolean {
+        val phoneRegex = Regex("^(\\+7|8)[0-9]{10,11}\$")
+        return phone.matches(phoneRegex)
+    }
+
+    private fun checkAndRegisterUser(
+        email: String,
+        telephone: String,
+        birthDate: String,
+        username: String,
+        password: String,
+        role: String = "user"
+    ) {
         lifecycleScope.launch {
             try {
                 // Проверка email и username в базе данных
@@ -99,7 +131,7 @@ class Registration : AppCompatActivity() {
 
                 // Регистрация пользователя
                 val userId = withContext(Dispatchers.IO) {
-                    userRepository.addUser(email, username, password)
+                    userRepository.addUser(email, telephone, birthDate, username, password, role)
                 }
 
                 if (userId > 0) {
