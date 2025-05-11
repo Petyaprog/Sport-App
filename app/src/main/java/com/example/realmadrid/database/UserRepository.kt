@@ -6,10 +6,6 @@ class UserRepository(private val userDao: UserDao) {
         return userDao.insertUser(user)
     }
 
-    suspend fun checkUser(username: String, password: String, role: String): Boolean {
-        return userDao.getUser(username, password, role) != null
-    }
-
     suspend fun isUsernameExists(username: String): Boolean {
         return userDao.getUserByUsername(username) != null
     }
@@ -37,6 +33,10 @@ class UserRepository(private val userDao: UserDao) {
 
     suspend fun logout() {
         userDao.clearCurrentUser()
+    }
+
+    suspend fun updateProfileImageUri(userId: Int, imageUri: String) {
+        userDao.updateProfileImageUri(userId, imageUri)
     }
 
     suspend fun getCurrentUser(): User? {

@@ -22,9 +22,6 @@ interface UserDao {
     @Query("DELETE FROM users WHERE username = :username")
     suspend fun deleteUser(username: String): Int
 
-    @Update
-    suspend fun updateUser(user: User): Int
-
     @Query("UPDATE users SET is_current = 0")
     suspend fun clearCurrentUser()
 
@@ -36,4 +33,7 @@ interface UserDao {
 
     @Query("SELECT id FROM users WHERE is_current = 1 LIMIT 1")
     suspend fun getCurrentUserId(): Int?
+
+    @Query("UPDATE users SET profile_image_uri = :imageUri WHERE id = :userId")
+    suspend fun updateProfileImageUri(userId: Int, imageUri: String)
 }

@@ -13,5 +13,6 @@ data class User(
     @ColumnInfo(name = "username") val username: String,
     @ColumnInfo(name = "password") val password: String,
     @ColumnInfo(name = "role") val role: String,
+    @ColumnInfo(name = "profile_image_uri") val profileImageUri: String? = null,
     @ColumnInfo(name = "is_current") val isCurrent: Boolean = false // флаг текущего пользователя
 )
