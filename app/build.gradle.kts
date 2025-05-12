@@ -43,6 +43,7 @@ android {
 
 dependencies {
     implementation(libs.glide)
+    implementation(libs.car.ui.lib)
     annotationProcessor(libs.glideCompiler)
     implementation(libs.sqliteassethelper)
     implementation(libs.retrofit)

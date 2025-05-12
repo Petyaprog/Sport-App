@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:columnCount="2"
+    android:background="@color/purple_700"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/userUsername"
+        android:layout_width="219dp"
+        android:layout_height="wrap_content"
+        android:layout_row="0"
+        android:layout_column="0"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/promoteButton"
+        android:layout_width="91dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_edittext"
+        android:backgroundTint="@color/purple"
+        android:text="Назначить админом"
+        android:textColor="@color/white"
+        android:textSize="9dp" />
+
+    <TextView
+        android:id="@+id/userEmail"
+        android:layout_width="219dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+</GridLayout>

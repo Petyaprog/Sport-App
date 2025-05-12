@@ -3,7 +3,6 @@ package com.example.realmadrid
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 
 class Wallpaper : AppCompatActivity() {
@@ -14,8 +13,7 @@ class Wallpaper : AppCompatActivity() {
         setContentView(R.layout.wallpaper)
 
         Handler().postDelayed({
-            val myIntent = Intent(this, Authentication::class.java)
-            startActivity(myIntent)
+            startActivity(Intent(this, Authentication::class.java))
             finish() // Завершение текущей активности
         }, 5000)
     }

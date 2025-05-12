@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.example.realmadrid.R
 import com.example.realmadrid.databinding.FragmentHomeBinding
 import com.example.realmadrid.databinding.ItemMatchHistoryBinding
 import com.example.realmadrid.databinding.StatisticsMatchBinding

@@ -31,8 +31,11 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE is_current = 1 LIMIT 1")
     suspend fun getCurrentUser(): User?
 
-    @Query("SELECT id FROM users WHERE is_current = 1 LIMIT 1")
-    suspend fun getCurrentUserId(): Int?
+    @Query("UPDATE users SET role = 'admin' WHERE id = :userId")
+    suspend fun promoteToAdmin(userId: Int)
+
+    @Query("SELECT * FROM users WHERE role = 'user'")
+    suspend fun getAllRegularUsers(): List<User>
 
     @Query("UPDATE users SET profile_image_uri = :imageUri WHERE id = :userId")
     suspend fun updateProfileImageUri(userId: Int, imageUri: String)

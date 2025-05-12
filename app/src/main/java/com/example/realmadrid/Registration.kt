@@ -1,6 +1,5 @@
 package com.example.realmadrid
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle

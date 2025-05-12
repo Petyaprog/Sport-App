@@ -42,4 +42,12 @@ class UserRepository(private val userDao: UserDao) {
     suspend fun getCurrentUser(): User? {
         return userDao.getCurrentUser()
     }
+
+    suspend fun promoteToAdmin(userId: Int) {
+        userDao.promoteToAdmin(userId)
+    }
+
+    suspend fun getAllRegularUsers(): List<User> {
+        return userDao.getAllRegularUsers()
+    }
 }
