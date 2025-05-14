@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -209,12 +210,25 @@ class ProfileFragment : Fragment(), NavigationView.OnNavigationItemSelectedListe
         lifecycleScope.launch {
             binding.personalInfoContainer.visibility = View.GONE
             binding.usersContainer.visibility = View.VISIBLE
+            val users = userRepository.getAllRegularUsers()
+
+            // Сначала очищаем контейнер
             binding.usersContainer.removeAllViews()
 
-            userRepository.getAllRegularUsers().forEach { user ->
+            // Создаем контейнер для всех пользователей
+            val usersLayout = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+
+            // Добавляем элементы пользователей в LinearLayout
+            users.forEach { user ->
                 val userView = layoutInflater.inflate(
                     R.layout.item_user,
-                    binding.usersContainer,
+                    usersLayout,
                     false
                 ).apply {
                     findViewById<TextView>(R.id.userUsername).text = user.username
@@ -223,8 +237,11 @@ class ProfileFragment : Fragment(), NavigationView.OnNavigationItemSelectedListe
                         promoteUser(user.id)
                     }
                 }
-                binding.usersContainer.addView(userView)
+                usersLayout.addView(userView)
             }
+
+            // Добавляем LinearLayout в ScrollView
+            binding.usersContainer.addView(usersLayout)
         }
     }
 

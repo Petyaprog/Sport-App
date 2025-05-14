@@ -1,15 +1,107 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/stats_scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="#F5F5F5"
     android:padding="16dp">
 
-    <EditText
-        android:id="@+id/etEmail"
+    <LinearLayout
+        android:id="@+id/stats_container"
         android:layout_width="match_parent"
-        android:layout_height="650dp"
-        android:hint="Email"
-        android:inputType="textEmailAddress" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/stats_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Статистика команды"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:paddingBottom="12dp" />
+
+        <!-- Период отчета -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Период: "
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/stats_period"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="01.03.2025 – 31.03.2025"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1A59A3" />
+        </LinearLayout>
+
+        <!-- Статистические данные -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Голы: "
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/stats_goals"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="12"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Матчи сыграно: "
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/stats_matches"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Победы: "
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/stats_wins"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Лучший игрок: "
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/stats_best_player"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Иванов И.И. (6 голов)"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp" />
+
+    </LinearLayout>
+</ScrollView>

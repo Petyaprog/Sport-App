@@ -2,7 +2,10 @@ package com.example.realmadrid.ui.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.ActionMode
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -20,6 +23,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private var allMatches: List<Match> = emptyList()
     private var currentMatchIndex = 0
+    private var currentTeamName: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,6 +55,7 @@ class HomeFragment : Fragment() {
         binding.searchButton.setOnClickListener {
             val query = binding.searchEditText.text.toString().trim()
             if (query.isNotEmpty()) {
+                currentTeamName = query
                 filterMatches(query)
             } else {
                 Toast.makeText(requireContext(), "Введите название команды", Toast.LENGTH_SHORT).show()
@@ -58,31 +63,77 @@ class HomeFragment : Fragment() {
         }
 
         binding.showAllButton.setOnClickListener {
+            currentTeamName = null
             showAllMatches()
         }
     }
 
     private fun filterMatches(query: String) {
         val filteredMatches = allMatches.filter {
-            it.match_hometeam_name.contains(query, ignoreCase = true) ||
-                    it.match_awayteam_name.contains(query, ignoreCase = true)
+            it.match_hometeam_name.equals(query, ignoreCase = true) ||
+                    it.match_awayteam_name.equals(query, ignoreCase = true)
         }
 
         if (filteredMatches.isEmpty()) {
             Toast.makeText(requireContext(), "Матчи не найдены", Toast.LENGTH_SHORT).show()
         } else {
-            showFilteredMatches(filteredMatches)
+            showFilteredMatches(filteredMatches, query)
         }
     }
 
-    private fun showFilteredMatches(matches: List<Match>) {
+    @SuppressLint("SetTextI18n")
+    private fun showFilteredMatches(matches: List<Match>, teamName: String) {
+        binding.statsResultLayout.visibility = View.VISIBLE
         binding.historyLayout.removeAllViews()
+
+        val teamMatches = allMatches.filter {
+            it.match_hometeam_name.equals(teamName, ignoreCase = true) ||
+                    it.match_awayteam_name.equals(teamName, ignoreCase = true)
+        }
+
+        if (teamMatches.isNotEmpty()) {
+            val totalMatches = teamMatches.size
+            val wins = teamMatches.count { match ->
+                (match.match_hometeam_name.equals(teamName, ignoreCase = true) && match.match_hometeam_score < match.match_awayteam_score) ||
+                        (match.match_awayteam_name.equals(teamName, ignoreCase = true) && match.match_awayteam_score < match.match_hometeam_score)
+            }
+            val losses = teamMatches.count { match ->
+                (match.match_hometeam_name.equals(teamName, ignoreCase = true) && match.match_hometeam_score > match.match_awayteam_score) ||
+                        (match.match_awayteam_name.equals(teamName, ignoreCase = true) && match.match_awayteam_score > match.match_hometeam_score)
+            }
+            val draws = teamMatches.count { it.match_hometeam_score == it.match_awayteam_score }
+
+            val goalsFor = teamMatches.sumOf { match ->
+                if (match.match_hometeam_name.equals(teamName, ignoreCase = true)) {
+                    match.match_hometeam_score.toIntOrNull() ?: 0
+                } else {
+                    match.match_awayteam_score.toIntOrNull() ?: 0
+                }
+            }
+
+            val goalsAgainst = teamMatches.sumOf { match ->
+                if (match.match_hometeam_name.equals(teamName, ignoreCase = true)) {
+                    match.match_awayteam_score.toIntOrNull() ?: 0
+                } else {
+                    match.match_hometeam_score.toIntOrNull() ?: 0
+                }
+            }
+
+            binding.matchesPlayed.text = "Матчей сыграно: $totalMatches"
+            binding.team1Wins.text = "Победы: $wins"
+            binding.team2Wins.text = "Поражения: $losses"
+            binding.barcelonaGoals.text = "Ничьи: $draws"
+            binding.realGoals.text = "Голы: $goalsAgainst - $goalsFor"
+            binding.statsHeader.text = "Статистика против $teamName"
+        }
+
         matches.forEach { match ->
             addMatchToHistoryLayout(match)
         }
     }
 
     private fun showAllMatches() {
+        binding.statsResultLayout.visibility = View.GONE
         binding.historyLayout.removeAllViews()
         allMatches.forEach { match ->
             addMatchToHistoryLayout(match)
@@ -117,7 +168,7 @@ class HomeFragment : Fragment() {
         binding.matchScoreTextView.text = if (match.match_status == "") {
             "${match.match_date} ${match.match_time}"
         } else {
-            "${match.match_hometeam_name} ${match.match_hometeam_score} - ${match.match_awayteam_score} ${match.match_awayteam_name}"
+            "${match.match_hometeam_score} - ${match.match_awayteam_score}"
         }
 
         Glide.with(requireContext()).load(match.team_home_badge).into(binding.homeTeamLogo)
@@ -141,16 +192,38 @@ class HomeFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun addMatchToHistoryLayout(match: Match) {
         val itemBinding = ItemMatchHistoryBinding.inflate(layoutInflater)
+
+        // Загружаем логотипы команд
         Glide.with(requireContext()).load(match.team_home_badge).into(itemBinding.historyHomeTeamLogo)
         Glide.with(requireContext()).load(match.team_away_badge).into(itemBinding.historyAwayTeamLogo)
+
+        // Устанавливаем текст с возможностью выделения
         itemBinding.historyScoreTextView.text =
             "${match.match_hometeam_name} ${match.match_hometeam_score} - ${match.match_awayteam_score} ${match.match_awayteam_name}"
 
+        // Настраиваем TextView для выделения текста
+        itemBinding.historyScoreTextView.setTextIsSelectable(true)
+        itemBinding.historyScoreTextView.customSelectionActionModeCallback = object : ActionMode.Callback {
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                // Убираем ненужные пункты меню (оставляем только копирование)
+                menu?.removeItem(android.R.id.selectAll)
+                menu?.removeItem(android.R.id.cut)
+                menu?.removeItem(android.R.id.shareText)
+                return true
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = true
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean = false
+            override fun onDestroyActionMode(mode: ActionMode?) {}
+        }
+
+        // Добавляем элемент в layout
         binding.historyLayout.addView(itemBinding.root)
     }
 
     private fun showHistory() {
         binding.StatisticsLayout.visibility = View.GONE
+        binding.statsResultLayout.visibility = View.GONE
         binding.historyLayout.visibility = View.VISIBLE
         binding.historyLayout.removeAllViews()
 
@@ -159,13 +232,14 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showStats() {
+        binding.statsResultLayout.visibility = View.GONE
         binding.historyLayout.visibility = View.GONE
         binding.StatisticsLayout.visibility = View.VISIBLE
         binding.StatisticsLayout.removeAllViews()
 
         val statsBinding = StatisticsMatchBinding.inflate(layoutInflater)
-        // Здесь можно заполнить данные статистики, если они есть
         binding.StatisticsLayout.addView(statsBinding.root)
     }
 
