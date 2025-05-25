@@ -1,6 +1,7 @@
 package com.example.realmadrid.ui.home
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.ActionMode
 import android.view.LayoutInflater
@@ -16,6 +17,9 @@ import com.example.realmadrid.databinding.FragmentHomeBinding
 import com.example.realmadrid.databinding.ItemMatchHistoryBinding
 import com.example.realmadrid.databinding.StatisticsMatchBinding
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class HomeFragment : Fragment() {
 
@@ -42,14 +46,24 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
+
         binding.historyButton.setOnClickListener {
-            showHistory()
+            binding.showBack.visibility = View.GONE
+            binding.seazon.visibility = View.VISIBLE
             binding.searchLayout.visibility = View.VISIBLE
+            showHistory()
+        }
+
+        binding.showBack.setOnClickListener {
+            binding.StatisticsLayout.visibility = View.GONE
+            binding.showBack.visibility = View.GONE
+            binding.period.visibility = View.VISIBLE
         }
 
         binding.statsButton.setOnClickListener {
-            showStats()
+            binding.seazon.visibility = View.GONE
             binding.searchLayout.visibility = View.GONE
+            showStats()
         }
 
         binding.searchButton.setOnClickListener {
@@ -145,8 +159,8 @@ class HomeFragment : Fragment() {
             try {
                 val response = RetrofitClient.apiService.getMatches(
                     teamId = 2986,
-                    from = "2024-08-07",
-                    to = "2025-12-09",
+                    from = "2024-07-20",
+                    to = "2025-05-25",
                     apiKey = "fbeb2c690d9967cfb237f410b95c9658dd64bdbf8143a629f0ffb56c216ebe64",
                     timezone = "Europe/Moscow"
                 )
@@ -222,6 +236,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun showHistory() {
+        binding.period.visibility = View.GONE
         binding.StatisticsLayout.visibility = View.GONE
         binding.statsResultLayout.visibility = View.GONE
         binding.historyLayout.visibility = View.VISIBLE
@@ -236,11 +251,105 @@ class HomeFragment : Fragment() {
     private fun showStats() {
         binding.statsResultLayout.visibility = View.GONE
         binding.historyLayout.visibility = View.GONE
-        binding.StatisticsLayout.visibility = View.VISIBLE
-        binding.StatisticsLayout.removeAllViews()
+        binding.StatisticsLayout.visibility = View.GONE
+        binding.period.visibility = View.VISIBLE
 
-        val statsBinding = StatisticsMatchBinding.inflate(layoutInflater)
-        binding.StatisticsLayout.addView(statsBinding.root)
+        // Настройка DatePicker для выбора дат
+        val calendar = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        binding.startDateEditText.setOnClickListener {
+            DatePickerDialog(requireContext(), { _, year, month, day ->
+                val selectedDate = Calendar.getInstance()
+                selectedDate.set(year, month, day)
+                binding.startDateEditText.setText(dateFormat.format(selectedDate.time))
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+        }
+
+        binding.endDateEditText.setOnClickListener {
+            DatePickerDialog(requireContext(), { _, year, month, day ->
+                val selectedDate = Calendar.getInstance()
+                selectedDate.set(year, month, day)
+                binding.endDateEditText.setText(dateFormat.format(selectedDate.time))
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+        }
+
+        binding.applyDateRangeButton.setOnClickListener {
+            val startDate = binding.startDateEditText.text.toString()
+            val endDate = binding.endDateEditText.text.toString()
+            val minDate = dateFormat.parse("2024-07-20")!!
+            val start = dateFormat.parse(startDate)
+            val end = dateFormat.parse(endDate)
+
+            if (startDate.isEmpty() || endDate.isEmpty()) {
+                Toast.makeText(requireContext(), "Выберите обе даты", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Фильтрация матчей по выбранному диапазону дат
+            val filteredMatches = allMatches.filter { match ->
+                val matchDate = dateFormat.parse(match.match_date) ?: return@filter false
+                matchDate in start..end
+            }
+
+            if (start != null) {
+                if (start.before(minDate)) {
+                    Toast.makeText(requireContext(), "Начальная дата должна быть не раньше 2024-07-20", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+
+            if (end != null) {
+                if (end.before(minDate)) {
+                    Toast.makeText(requireContext(), "Конечная дата должна быть не раньше 2024-07-20", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+
+            if (start != null) {
+                if (start.after(end)) {
+                    Toast.makeText(requireContext(), "Начальная дата не может быть позже конечной", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
+
+            if (filteredMatches.isEmpty()) {
+                Toast.makeText(requireContext(), "Нет матчей в выбранном диапазоне", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Скрываем форму выбора дат и показываем статистику
+            binding.period.visibility = View.GONE
+            binding.StatisticsLayout.visibility = View.VISIBLE
+            binding.showBack.visibility = View.VISIBLE
+
+            // Создаем и заполняем статистику
+            val statsBinding = StatisticsMatchBinding.inflate(layoutInflater)
+            binding.StatisticsLayout.removeAllViews()
+            binding.StatisticsLayout.addView(statsBinding.root)
+
+            // Подсчет статистики
+            val totalMatches = filteredMatches.size
+            val wins = filteredMatches.count { it.match_hometeam_score > it.match_awayteam_score }
+            val losses = filteredMatches.count { it.match_hometeam_score < it.match_awayteam_score }
+            val draws = filteredMatches.count { it.match_hometeam_score == it.match_awayteam_score }
+
+            val goalsScored = filteredMatches.sumOf { it.match_hometeam_score.toIntOrNull() ?: 0 }
+            val goalsConceded = filteredMatches.sumOf { it.match_awayteam_score.toIntOrNull() ?: 0 }
+
+            val bestPlayer = filteredMatches.flatMap { match ->
+                match.goalscorer.filter { !it.home_scorer.isNullOrEmpty() }.map { it.home_scorer to it.time }
+            }.groupBy { it.first }
+                .maxByOrNull { it.value.size }
+                ?.key ?: "Не определен"
+
+            // Заполняем данные статистики
+            statsBinding.statsPeriod.text = "$startDate - $endDate"
+            statsBinding.statsGoals.text = "$goalsScored - $goalsConceded (забито - пропущено)"
+            statsBinding.statsMatches.text = totalMatches.toString()
+            statsBinding.statsWins.text = "$wins победы, $losses поражения, $draws ничьи"
+            statsBinding.statsBestPlayer.text = bestPlayer
+        }
     }
 
     override fun onDestroyView() {
