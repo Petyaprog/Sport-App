@@ -20,8 +20,4 @@ data class Match(
     val match_awayteam_id: String,
     val match_awayteam_score: String,
     val goalscorer: List<Goal>,
-    val substitutions: Substitutions,
-    val cards: List<Card>,
-    val lineup: Lineup,
-    val statistics: List<Statistic>
 )
