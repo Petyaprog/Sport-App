@@ -5,9 +5,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
 
-@Database(entities = [User::class], version = 5, exportSchema = true )
+@Database( entities = [User::class, News::class], version = 6, exportSchema = true )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
+    abstract fun newsDao(): NewsDao
 
     object DatabaseProvider {
         private var database: AppDatabase? = null
@@ -22,6 +23,10 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getUserRepository(): UserRepository {
             return UserRepository(database!!.userDao())
+        }
+
+        fun getNewsRepository(): NewsRepository {
+            return NewsRepository(database!!.newsDao())
         }
     }
 }

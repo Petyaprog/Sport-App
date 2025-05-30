@@ -13,20 +13,47 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.example.realmadrid.ui.dashboard.CalendarFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_calendar" />
+        android:name="com.example.realmadrid.ui.notifications.NewsFragment"
+        android:label="@string/title_notifications"
+        tools:layout="@layout/fragment_news">
+
+        <action
+            android:id="@+id/action_newsFragment_to_newsDetailFragment"
+            app:destination="@id/newsDetailFragment" />
+
+        <action
+            android:id="@+id/action_newsFragment_to_addEditNewsFragment"
+            app:destination="@id/addEditNewsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.realmadrid.ui.notifications.NewsFragment"
+        android:name="com.example.realmadrid.ui.dashboard.CalendarFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_news" />
+        tools:layout="@layout/fragment_calendar" />
 
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.example.realmadrid.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
+
+    <!-- Вспомогательные фрагменты -->
+    <fragment
+        android:id="@+id/newsDetailFragment"
+        android:name="com.example.realmadrid.ui.notifications.NewsDetailFragment"
+        android:label="News Detail"
+        tools:layout="@layout/fragment_news_detail">
+
+        <action
+            android:id="@+id/action_newsDetailFragment_to_addEditNewsFragment"
+            app:destination="@id/addEditNewsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditNewsFragment"
+        android:name="com.example.realmadrid.ui.notifications.AddEditNewsFragment"
+        android:label="Add/Edit News"
+        tools:layout="@layout/fragment_add_edit_news" />
 
 </navigation>

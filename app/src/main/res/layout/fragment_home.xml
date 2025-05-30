@@ -120,8 +120,8 @@
                     android:layout_weight="1"
                     android:background="@drawable/custom_edittext"
                     android:backgroundTint="@color/purple"
-                    android:text="History"
                     android:textColor="@color/white"
+                    android:text="History"
                     android:textSize="15sp"
                     android:layout_marginEnd="4dp"
                     app:cornerRadius="15dp"/>
@@ -133,8 +133,8 @@
                     android:layout_weight="1"
                     android:background="@drawable/custom_edittext"
                     android:backgroundTint="@color/purple"
-                    android:text="Stats"
                     android:textColor="@color/white"
+                    android:text="Stats"
                     android:textSize="15sp"
                     android:layout_marginStart="4dp"
                     app:cornerRadius="15dp"/>
