@@ -1,4 +1,4 @@
-package com.example.realmadrid.ui.home
+package com.example.realmadrid.API
 
 import retrofit2.http.GET
 import retrofit2.http.Query

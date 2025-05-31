@@ -14,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.realmadrid.database.AppDatabase
 import com.example.realmadrid.database.News
 import com.example.realmadrid.databinding.FragmentAddEditNewsBinding
-import com.example.realmadrid.R
 import com.bumptech.glide.Glide
 import com.example.realmadrid.database.NewsRepository
 import kotlinx.coroutines.launch

@@ -1,7 +1,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1A59A3">
@@ -42,8 +41,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="16dp"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -69,7 +67,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:textColor="@android:color/black"
-                        android:textSize="16sp" />
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
                 </LinearLayout>
 
                 <ImageView
@@ -161,8 +160,7 @@
                 android:text="Сезон 24/25"
                 android:layout_gravity="center"
                 android:textColor="@color/lavender"
-                android:textSize="12dp"
-                android:visibility="gone"/>
+                android:textSize="12dp" />
 
             <LinearLayout
                 android:id="@+id/search_layout"
@@ -182,6 +180,7 @@
                     android:inputType="text"
                     android:textSize="16dp"
                     android:padding="8dp"
+                    android:textColorHint="@color/gray"
                     android:textColorHighlight="@color/lavender"
                     android:textColor="@color/white"
                     android:layout_marginEnd="8dp"/>
@@ -201,13 +200,12 @@
                     android:id="@+id/show_all_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Все"
+                    android:text="Назад"
                     android:background="@drawable/custom_edittext"
                     android:backgroundTint="@color/purple"
                     android:textColor="@color/white"
                     app:cornerRadius="15dp"/>
             </LinearLayout>
-
 
             <LinearLayout
                 android:id="@+id/stats_result_layout"

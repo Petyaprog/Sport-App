@@ -1,4 +1,4 @@
-package com.example.realmadrid.ui.home
+package com.example.realmadrid.API
 
 data class Match(
     val match_id: String,

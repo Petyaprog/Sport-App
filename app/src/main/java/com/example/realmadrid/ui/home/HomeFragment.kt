@@ -13,6 +13,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.example.realmadrid.API.Match
+import com.example.realmadrid.API.RetrofitClient
 import com.example.realmadrid.databinding.FragmentHomeBinding
 import com.example.realmadrid.databinding.ItemMatchHistoryBinding
 import com.example.realmadrid.databinding.StatisticsMatchBinding
@@ -27,6 +29,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private var allMatches: List<Match> = emptyList()
     private var currentMatchIndex = 0
+    private val uniqueTeams = mutableSetOf<String>()
     private var currentTeamName: String? = null
 
     override fun onCreateView(
@@ -49,7 +52,6 @@ class HomeFragment : Fragment() {
 
         binding.historyButton.setOnClickListener {
             binding.showBack.visibility = View.GONE
-            binding.seazon.visibility = View.VISIBLE
             binding.searchLayout.visibility = View.VISIBLE
             showHistory()
         }
@@ -61,7 +63,6 @@ class HomeFragment : Fragment() {
         }
 
         binding.statsButton.setOnClickListener {
-            binding.seazon.visibility = View.GONE
             binding.searchLayout.visibility = View.GONE
             showStats()
         }
@@ -142,7 +143,7 @@ class HomeFragment : Fragment() {
         }
 
         matches.forEach { match ->
-            addMatchToHistoryLayout(match)
+            addMatchToHistory(match)
         }
     }
 
@@ -150,7 +151,7 @@ class HomeFragment : Fragment() {
         binding.statsResultLayout.visibility = View.GONE
         binding.historyLayout.removeAllViews()
         allMatches.forEach { match ->
-            addMatchToHistoryLayout(match)
+            listTeams(match)
         }
     }
 
@@ -204,34 +205,44 @@ class HomeFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun addMatchToHistoryLayout(match: Match) {
+    private fun listTeams(match: Match) {
+
+        if (match.match_awayteam_name == "Billericay Town") return
+        if (match.match_awayteam_name == "Billericay") return
         val itemBinding = ItemMatchHistoryBinding.inflate(layoutInflater)
 
-        // Загружаем логотипы команд
-        Glide.with(requireContext()).load(match.team_home_badge).into(itemBinding.historyHomeTeamLogo)
         Glide.with(requireContext()).load(match.team_away_badge).into(itemBinding.historyAwayTeamLogo)
 
-        // Устанавливаем текст с возможностью выделения
-        itemBinding.historyScoreTextView.text =
-            "${match.match_hometeam_name} ${match.match_hometeam_score} - ${match.match_awayteam_score} ${match.match_awayteam_name}"
+        itemBinding.historyScoreTextView.text = match.match_awayteam_name
+        match.match_awayteam_name?.let { uniqueTeams.add(it) }
 
-        // Настраиваем TextView для выделения текста
+        // Настройка выделения текста
         itemBinding.historyScoreTextView.setTextIsSelectable(true)
         itemBinding.historyScoreTextView.customSelectionActionModeCallback = object : ActionMode.Callback {
             override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-                // Убираем ненужные пункты меню (оставляем только копирование)
                 menu?.removeItem(android.R.id.selectAll)
                 menu?.removeItem(android.R.id.cut)
                 menu?.removeItem(android.R.id.shareText)
                 return true
             }
-
-            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = true
-            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean = false
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = true
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?) = false
             override fun onDestroyActionMode(mode: ActionMode?) {}
         }
 
-        // Добавляем элемент в layout
+        binding.historyLayout.addView(itemBinding.root)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun addMatchToHistory(match: Match) {
+        val itemBinding = ItemMatchHistoryBinding.inflate(layoutInflater)
+
+        Glide.with(requireContext()).load(match.team_home_badge).into(itemBinding.historyHomeTeamLogo)
+        Glide.with(requireContext()).load(match.team_away_badge).into(itemBinding.historyAwayTeamLogo)
+
+        itemBinding.historyScoreTextView.text =
+            "${match.match_awayteam_name} ${match.match_awayteam_score} - ${match.match_hometeam_score} ${match.match_hometeam_name}"
+
         binding.historyLayout.addView(itemBinding.root)
     }
 
@@ -243,18 +254,18 @@ class HomeFragment : Fragment() {
         binding.historyLayout.removeAllViews()
 
         allMatches.forEach { match ->
-            addMatchToHistoryLayout(match)
+            listTeams(match)
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun showStats() {
+        binding.showBack.visibility = View.GONE
         binding.statsResultLayout.visibility = View.GONE
         binding.historyLayout.visibility = View.GONE
         binding.StatisticsLayout.visibility = View.GONE
         binding.period.visibility = View.VISIBLE
 
-        // Настройка DatePicker для выбора дат
         val calendar = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
@@ -343,7 +354,6 @@ class HomeFragment : Fragment() {
                 .maxByOrNull { it.value.size }
                 ?.key ?: "Не определен"
 
-            // Заполняем данные статистики
             statsBinding.statsPeriod.text = "$startDate - $endDate"
             statsBinding.statsGoals.text = "$goalsScored - $goalsConceded (забито - пропущено)"
             statsBinding.statsMatches.text = totalMatches.toString()

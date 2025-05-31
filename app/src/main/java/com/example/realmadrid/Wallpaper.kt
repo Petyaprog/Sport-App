@@ -14,7 +14,7 @@ class Wallpaper : AppCompatActivity() {
 
         Handler().postDelayed({
             startActivity(Intent(this, Authentication::class.java))
-            finish() // Завершение текущей активности
+            finish()
         }, 5000)
     }
 }

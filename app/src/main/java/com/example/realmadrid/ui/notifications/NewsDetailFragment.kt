@@ -9,7 +9,6 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.example.realmadrid.R
 import com.example.realmadrid.database.AppDatabase
-import com.example.realmadrid.database.News
 import com.example.realmadrid.database.NewsRepository
 import com.example.realmadrid.databinding.FragmentNewsDetailBinding
 import kotlinx.coroutines.CoroutineScope

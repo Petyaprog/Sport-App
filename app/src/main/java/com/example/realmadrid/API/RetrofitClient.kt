@@ -1,4 +1,4 @@
-package com.example.realmadrid.ui.home
+package com.example.realmadrid.API
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
