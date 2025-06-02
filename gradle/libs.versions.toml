@@ -11,7 +11,7 @@ retrofit = "2.9.0"
 okhttp = "4.9.3"
 kotlinx-coroutines = "1.7.3"
 lifecycle-runtime = "2.8.7"
-agp = "8.10.0"
+agp = "8.10.1"
 kotlin = "2.1.20"
 ksp = "2.1.20-1.0.32"
 room = "2.7.1"
@@ -42,11 +42,6 @@ logging-interceptor-v493 = { module = "com.squareup.okhttp3:logging-interceptor"
 okhttp-v493 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
-okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle-runtime" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

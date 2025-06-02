@@ -3,6 +3,7 @@ package com.example.realmadrid.ui.home
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
@@ -19,6 +20,7 @@ import com.example.realmadrid.databinding.FragmentHomeBinding
 import com.example.realmadrid.databinding.ItemMatchHistoryBinding
 import com.example.realmadrid.databinding.StatisticsMatchBinding
 import kotlinx.coroutines.launch
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -286,79 +288,88 @@ class HomeFragment : Fragment() {
         }
 
         binding.applyDateRangeButton.setOnClickListener {
-            val startDate = binding.startDateEditText.text.toString()
-            val endDate = binding.endDateEditText.text.toString()
-            val minDate = dateFormat.parse("2024-07-20")!!
-            val start = dateFormat.parse(startDate)
-            val end = dateFormat.parse(endDate)
+            try {
+                val startDate = binding.startDateEditText.text.toString()
+                val endDate = binding.endDateEditText.text.toString()
 
-            if (startDate.isEmpty() || endDate.isEmpty()) {
-                Toast.makeText(requireContext(), "Выберите обе даты", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Фильтрация матчей по выбранному диапазону дат
-            val filteredMatches = allMatches.filter { match ->
-                val matchDate = dateFormat.parse(match.match_date) ?: return@filter false
-                matchDate in start..end
-            }
-
-            if (start != null) {
-                if (start.before(minDate)) {
-                    Toast.makeText(requireContext(), "Начальная дата должна быть не раньше 2024-07-20", Toast.LENGTH_SHORT).show()
+                if (startDate.isEmpty() || endDate.isEmpty()) {
+                    Toast.makeText(requireContext(), "Выберите обе даты", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-            }
 
-            if (end != null) {
-                if (end.before(minDate)) {
-                    Toast.makeText(requireContext(), "Конечная дата должна быть не раньше 2024-07-20", Toast.LENGTH_SHORT).show()
+                val minDate = dateFormat.parse("2024-07-20") ?: return@setOnClickListener
+                val start = dateFormat.parse(startDate)
+                val end = dateFormat.parse(endDate)
+
+                if (start != null) {
+                    if (start.before(minDate)) {
+                        Toast.makeText(requireContext(), "Начальная дата должна быть не раньше 2024-07-20", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                }
+
+                if (end != null) {
+                    if (end.before(minDate)) {
+                        Toast.makeText(requireContext(), "Конечная дата должна быть не раньше 2024-07-20", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                }
+
+                if (start != null) {
+                    if (start.after(end)) {
+                        Toast.makeText(requireContext(), "Начальная дата не может быть позже конечной", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                }
+
+                // Фильтрация матчей по выбранному диапазону дат
+                val filteredMatches = allMatches.filter { match ->
+                    try {
+                        val matchDate = dateFormat.parse(match.match_date) ?: return@filter false
+                        matchDate in start..end
+                    } catch (e: ParseException) {
+                        false
+                    }
+                }
+
+                if (filteredMatches.isEmpty()) {
+                    Toast.makeText(requireContext(), "Нет матчей в выбранном диапазоне", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
+
+                binding.period.visibility = View.GONE
+                binding.StatisticsLayout.visibility = View.VISIBLE
+                binding.showBack.visibility = View.VISIBLE
+
+                // Создаем и заполняем статистику
+                val statsBinding = StatisticsMatchBinding.inflate(layoutInflater)
+                binding.StatisticsLayout.removeAllViews()
+                binding.StatisticsLayout.addView(statsBinding.root)
+
+                // Подсчет статистики
+                val totalMatches = filteredMatches.size
+                val wins = filteredMatches.count { it.match_hometeam_score > it.match_awayteam_score }
+                val losses = filteredMatches.count { it.match_hometeam_score < it.match_awayteam_score }
+                val draws = filteredMatches.count { it.match_hometeam_score == it.match_awayteam_score }
+
+                val goalsScored = filteredMatches.sumOf { it.match_hometeam_score.toIntOrNull() ?: 0 }
+                val goalsConceded = filteredMatches.sumOf { it.match_awayteam_score.toIntOrNull() ?: 0 }
+
+                val bestPlayer = filteredMatches.flatMap { match ->
+                    match.goalscorer?.filter { !it.home_scorer.isNullOrEmpty() }?.map { it.home_scorer to it.time } ?: emptyList()
+                }.groupBy { it.first }
+                    .maxByOrNull { it.value.size }
+                    ?.key ?: "Не определен"
+
+                statsBinding.statsPeriod.text = "$startDate - $endDate"
+                statsBinding.statsGoals.text = "$goalsScored - $goalsConceded (забито - пропущено)"
+                statsBinding.statsMatches.text = totalMatches.toString()
+                statsBinding.statsWins.text = "$wins победы, $losses поражения, $draws ничьи"
+                statsBinding.statsBestPlayer.text = bestPlayer
+
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Ошибка: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
-
-            if (start != null) {
-                if (start.after(end)) {
-                    Toast.makeText(requireContext(), "Начальная дата не может быть позже конечной", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-            }
-
-            if (filteredMatches.isEmpty()) {
-                Toast.makeText(requireContext(), "Нет матчей в выбранном диапазоне", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Скрываем форму выбора дат и показываем статистику
-            binding.period.visibility = View.GONE
-            binding.StatisticsLayout.visibility = View.VISIBLE
-            binding.showBack.visibility = View.VISIBLE
-
-            // Создаем и заполняем статистику
-            val statsBinding = StatisticsMatchBinding.inflate(layoutInflater)
-            binding.StatisticsLayout.removeAllViews()
-            binding.StatisticsLayout.addView(statsBinding.root)
-
-            // Подсчет статистики
-            val totalMatches = filteredMatches.size
-            val wins = filteredMatches.count { it.match_hometeam_score > it.match_awayteam_score }
-            val losses = filteredMatches.count { it.match_hometeam_score < it.match_awayteam_score }
-            val draws = filteredMatches.count { it.match_hometeam_score == it.match_awayteam_score }
-
-            val goalsScored = filteredMatches.sumOf { it.match_hometeam_score.toIntOrNull() ?: 0 }
-            val goalsConceded = filteredMatches.sumOf { it.match_awayteam_score.toIntOrNull() ?: 0 }
-
-            val bestPlayer = filteredMatches.flatMap { match ->
-                match.goalscorer.filter { !it.home_scorer.isNullOrEmpty() }.map { it.home_scorer to it.time }
-            }.groupBy { it.first }
-                .maxByOrNull { it.value.size }
-                ?.key ?: "Не определен"
-
-            statsBinding.statsPeriod.text = "$startDate - $endDate"
-            statsBinding.statsGoals.text = "$goalsScored - $goalsConceded (забито - пропущено)"
-            statsBinding.statsMatches.text = totalMatches.toString()
-            statsBinding.statsWins.text = "$wins победы, $losses поражения, $draws ничьи"
-            statsBinding.statsBestPlayer.text = bestPlayer
         }
     }
 

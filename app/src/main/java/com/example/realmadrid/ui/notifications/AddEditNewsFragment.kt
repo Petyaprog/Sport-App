@@ -50,8 +50,7 @@ class AddEditNewsFragment : Fragment() {
 
         newsRepository = AppDatabase.DatabaseProvider.getNewsRepository()
 
-        // Если переданы данные, значит это редактирование
-        arguments?.let { bundle ->
+         arguments?.let { bundle ->
             currentNewsId = bundle.getString("id")?.toIntOrNull()
             binding.newsTitle.setText(bundle.getString("title", ""))
             binding.newsDate.setText(bundle.getString("date", ""))
@@ -67,6 +66,14 @@ class AddEditNewsFragment : Fragment() {
         binding.btnSelectImage.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             pickImage.launch(intent)
+        }
+
+        binding.newsFullText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.scrollView.post {
+                    binding.scrollView.smoothScrollTo(0, binding.newsFullText.bottom)
+                }
+            }
         }
 
         binding.btnSave.setOnClickListener {
@@ -94,7 +101,6 @@ class AddEditNewsFragment : Fragment() {
                 )
                 newsRepository.updateNews(news)
             } else {
-                // Добавление новой новости
                 newsRepository.addNews(title, date, previewText, fullText, imageUrl)
             }
             parentFragmentManager.popBackStack()

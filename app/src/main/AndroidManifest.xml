@@ -13,13 +13,16 @@
     <application
         android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
+        android:debuggable="true"
+        android:windowSoftInputMode="adjustResize"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+        tools:ignore="HardcodedDebugMode">
         <activity
             android:name=".Wallpaper"
             android:exported="true">

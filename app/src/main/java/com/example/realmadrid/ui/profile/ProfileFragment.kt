@@ -224,7 +224,6 @@ class ProfileFragment : Fragment(), NavigationView.OnNavigationItemSelectedListe
                 )
             }
 
-            // Добавляем элементы пользователей в LinearLayout
             users.forEach { user ->
                 val userView = layoutInflater.inflate(
                     R.layout.item_user,
@@ -240,7 +239,6 @@ class ProfileFragment : Fragment(), NavigationView.OnNavigationItemSelectedListe
                 usersLayout.addView(userView)
             }
 
-            // Добавляем LinearLayout в ScrollView
             binding.usersContainer.addView(usersLayout)
         }
     }
